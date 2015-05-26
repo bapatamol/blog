@@ -15,6 +15,41 @@ else
 // connect to database
 require "../dbconnect.php"; 
 
+
+// analytics - update blog_views
+
+// ensure the postID exists, if not ad it.
+$query = "select count from blog_views where postID = '" . $postID . "'";
+//echo $query;
+
+//echo "<br/>";
+$result = mysql_query($query);
+
+if(mysql_fetch_array($result) === false) {
+    $insertQuery = "insert into blog_views values ('". $postID ."', 0) ";
+    //echo $insertQuery . "<br/>";
+    mysql_query($insertQuery);
+}
+
+
+$query = "update blog_views set count = count + 1 where postID = '" . $postID . "'";
+
+//echo $query;
+// execute query
+mysql_query($query);
+
+
+// analytics -- snoop
+$insertQuery = "insert into blog_snoop values (0, '" . $_SERVER["REQUEST_URI"] ."' , '" . $_SERVER["REQUEST_TIME"] . "' , '" . $_SERVER["REMOTE_ADDR"] . "') ";
+//echo $insertQuery . "<br/>";
+mysql_query($insertQuery);
+
+
+
+
+
+// fetch rating
+
 $query = "select rating1, rating2, rating3, rating4, rating5, ratingCount from rating where postID = '". $postID . "'";
 // execute query
 $result = mysql_query($query);
@@ -30,7 +65,8 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
 	$rC =  $row['ratingCount'];
 }
 
-$r = (5 * $r5 + 4 * $r4 + 3 * $r3 + 2 * $r2 + 1 * $r1) / $rC;
-
+if ($rC > 0) {
+	$r = (5 * $r5 + 4 * $r4 + 3 * $r3 + 2 * $r2 + 1 * $r1) / $rC;
+}
 echo $r;
 ?>
