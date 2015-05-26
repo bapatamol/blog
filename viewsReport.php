@@ -23,11 +23,29 @@ while ($row = mysql_fetch_array($result, MYSQL_NUM))
         $response=@file_get_contents('http://www.netip.de/search?query='.$ip);
         
         $country = '#Country: (.*?)&nbsp;#i';
-        preg_match ($country, $response, $value);
+        preg_match ($country, $response, $c);
 
-        $loc = trim(substr($value[0], 13));
-	$loc = substr($loc, 0,  strpos ($loc, "&nbsp;"));
-        echo "['".trim($loc)."', '".trim($loc).": ".$ct."'],";
+        $state = '#State/Region: (.*?)<br#i';
+	preg_match ($state, $repsonse, $s);
+
+	$town = '#City: (.*?)<br#i';
+	preg_match ($town, $response, $t);
+
+	//echo $c[1] . " " . empty($c[1]);
+	//echo "\n";
+	//echo $s[1] . " " . empty($s[1]);
+	//echo "\n";
+	//echo $t[1] . " " . empty($t[1]);
+	//echo "\n";
+	
+	if (!empty($t[1])) {
+		$loc = $t[1];
+	} else if (!empty($s[1])) {
+		$loc = $s[1];
+	} else if (!empty($c[1])) {
+		$loc = $c[1];
+	}
+	echo "['".trim($loc)."', '".trim($loc).": ".$ct."'],";
 }
 ?>
 
